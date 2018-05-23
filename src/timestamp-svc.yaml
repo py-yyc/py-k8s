@@ -1,0 +1,31 @@
+# Create a TCP server that returns the current time as text
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: timestamp
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: timestamp
+    spec:
+      containers:
+      - name: hello
+        image: alpine/socat
+        command: ["socat", "-v", "TCP4-LISTEN:1234,fork,reuseaddr",
+          'SYSTEM:echo "Timestamp service: $(date)"']
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: timestamp
+ labels:
+   app: timestamp
+spec:
+  type: NodePort
+  ports:
+  - port: 1234
+    name: timestamp
+  selector:
+    app: timestamp
